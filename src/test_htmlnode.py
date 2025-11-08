@@ -22,6 +22,20 @@ class TestTextNode(unittest.TestCase):
         parent_node = ParentNode("div", [child_node])
         self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
 
+    def test_props_to_html_with_none_raises(self):
+        node = HTMLNode('p', 'v', None, None)
+        # props_to_html calls .items() on props; when props is None this should raise
+        with self.assertRaises(AttributeError):
+            node.props_to_html()
+
+    def test_parent_with_multiple_children_returns_first_child_only(self):
+        # Current ParentNode.to_html returns the rendering for the first child only
+        c1 = LeafNode('b', '1')
+        c2 = LeafNode('i', '2')
+        p = ParentNode('div', [c1, c2])
+        # Document current behavior: only the first child's HTML is included
+        self.assertEqual(p.to_html(), '<div><b>1</b></div>')
+
 def test_to_html_with_grandchildren(self):
     grandchild_node = LeafNode("b", "grandchild")
     child_node = ParentNode("span", [grandchild_node])
