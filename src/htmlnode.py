@@ -9,6 +9,8 @@ class HTMLNode():
         raise NotImplementedError
     
     def props_to_html(self):
+        if self.props is None:
+            return ""
         str = ""
         for key, value in self.props.items():
             str += key + "=" + value + " "
@@ -30,7 +32,7 @@ class LeafNode(HTMLNode):
         elif self.tag == None:
             return self.value
         else:
-            return f"<{self.tag}>{self.value}</{self.tag}>"
+            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
 
 class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
