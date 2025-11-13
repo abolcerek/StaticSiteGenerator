@@ -2,6 +2,7 @@ import unittest
 from inline_markdown import (
     split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 )
+from block_markdown import markdown_to_blocks, block_to_block_type, BlockType
 
 from textnode import TextNode, TextType
 
@@ -343,6 +344,59 @@ class TestInlineMarkdown(unittest.TestCase):
             TextNode("bold", TextType.BOLD),
             TextNode(" b", TextType.TEXT),
         ])
+    
+    def test_heading_simple(self):
+        self.assertEqual(block_to_block_type("# Title"), BlockType.HEADING)
+
+    def test_heading_six_hashes(self):
+        self.assertEqual(block_to_block_type("###### Six"), BlockType.HEADING)
+
+    def test_heading_too_many_hashes(self):
+        self.assertEqual(block_to_block_type("####### Seven"), BlockType.PARAGRAPH)
+
+    def test_heading_missing_space(self):
+        self.assertEqual(block_to_block_type("###NoSpace"), BlockType.PARAGRAPH)
+
+    def test_code_fenced_multiline(self):
+        block = "```\nprint('x')\n```"
+        self.assertEqual(block_to_block_type(block), BlockType.CODE)
+
+    def test_code_single_line_backticks_only(self):
+        self.assertEqual(block_to_block_type("```"), BlockType.PARAGRAPH)
+
+    def test_quote_all_lines_start_with_gt(self):
+        block = "> a\n> b"
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
+
+    def test_quote_mixed_lines(self):
+        block = "> a\nb"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_unordered_list_valid(self):
+        block = "- a\n- b"
+        self.assertEqual(block_to_block_type(block), BlockType.UNORDERED_LIST)
+
+    def test_unordered_list_missing_space(self):
+        self.assertEqual(block_to_block_type("-a"), BlockType.PARAGRAPH)
+
+    def test_ordered_list_valid(self):
+        block = "1. a\n2. b\n3. c"
+        self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
+
+    def test_ordered_list_skipped_number(self):
+        block = "1. a\n3. b"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_ordered_list_wrong_start(self):
+        block = "0. a\n1. b"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_ordered_list_must_start_at_one(self):
+        block = "10. a\n11. b"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_paragraph_fallback(self):
+        self.assertEqual(block_to_block_type("just some text"), BlockType.PARAGRAPH)
 
 
 if __name__ == "__main__":
