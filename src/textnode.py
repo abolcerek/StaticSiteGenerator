@@ -27,20 +27,20 @@ class TextNode():
         url = self.url if self.url is not None else ""
         return f"TextNode({self.text}, {self.text_type.value}, {url})"
     
-    def text_node_to_html_node(text_node):
-        if text_node.text_type == TextType.TEXT:
-            return LeafNode(None, text_node.text) 
-        if text_node.text_type == TextType.BOLD:
-            return LeafNode("b", text_node.text) 
-        if text_node.text_type == TextType.ITALIC:
-            return LeafNode("i", text_node.text) 
-        if text_node.text_type == TextType.CODE:
-            return LeafNode("code", text_node.text) 
-        if text_node.text_type == TextType.LINK:
-            return LeafNode("a",text_node.text, {"href": ""}) 
-        if text_node.text_type == TextType.IMAGE:
-            return LeafNode("img", "", {"src": text_node.url, "alt": text_node.text} ) 
-        raise ValueError(f"invalid text type: {text_node.text_type}")
+    def text_node_to_html_node(self):
+        if self.text_type == TextType.TEXT:
+            return LeafNode(None, self.text) 
+        if self.text_type == TextType.BOLD:
+            return LeafNode("b", self.text) 
+        if self.text_type == TextType.ITALIC:
+            return LeafNode("i", self.text) 
+        if self.text_type == TextType.CODE:
+            return LeafNode("code", self.text) 
+        if self.text_type == TextType.LINK:
+            return LeafNode("a",self.text, {"href": ""}) 
+        if self.text_type == TextType.IMAGE:
+            return LeafNode("img", "", {"src": self.url, "alt": self.text} ) 
+        raise ValueError(f"invalid text type: {self.text_type}")
     
     
         

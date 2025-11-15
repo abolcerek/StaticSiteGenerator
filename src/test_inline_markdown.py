@@ -372,26 +372,26 @@ class TestInlineMarkdown(unittest.TestCase):
         block = "> a\nb"
         self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
-    def test_unordered_list_valid(self):
+    def test_UNORDEREDLIST_valid(self):
         block = "- a\n- b"
-        self.assertEqual(block_to_block_type(block), BlockType.UNORDERED_LIST)
+        self.assertEqual(block_to_block_type(block), BlockType.UNORDEREDLIST)
 
-    def test_unordered_list_missing_space(self):
+    def test_UNORDEREDLIST_missing_space(self):
         self.assertEqual(block_to_block_type("-a"), BlockType.PARAGRAPH)
 
-    def test_ordered_list_valid(self):
+    def test_ORDEREDLIST_valid(self):
         block = "1. a\n2. b\n3. c"
-        self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
+        self.assertEqual(block_to_block_type(block), BlockType.ORDEREDLIST)
 
-    def test_ordered_list_skipped_number(self):
+    def test_ORDEREDLIST_skipped_number(self):
         block = "1. a\n3. b"
         self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
-    def test_ordered_list_wrong_start(self):
+    def test_ORDEREDLIST_wrong_start(self):
         block = "0. a\n1. b"
         self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
-    def test_ordered_list_must_start_at_one(self):
+    def test_ORDEREDLIST_must_start_at_one(self):
         block = "10. a\n11. b"
         self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
 
