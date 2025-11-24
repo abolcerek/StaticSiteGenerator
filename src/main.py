@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 from block_markdown import *
 
@@ -34,7 +35,7 @@ def extract_title(markdown):
     raise Exception("There is no h1 header")
             
     
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f'Generating page from {from_path} to {dest_path} using {template_path}')
     with open (from_path, 'r') as file:
         from_content = file.read()
@@ -42,11 +43,11 @@ def generate_page(from_path, template_path, dest_path):
         template_content = file.read()
     title = extract_title(from_content)
     HTML_string = markdown_to_html_node(from_content).to_html()
-    new_content = "".join(template_content.replace("{{ Title }}", f'{title}').replace("{{ Content }}", f'{HTML_string}'))
+    new_content = "".join(template_content.replace("{{ Title }}", f'{title}').replace("{{ Content }}", f'{HTML_string}').replace('href="/', 'href="' + basepath).replace('src="/', 'src="' + basepath))
     with open(dest_path, 'w') as file:
         file.write(new_content)
         
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     def recursion(dir_path_content, template_path, dest_dir_path):
         if not os.path.exists(dest_dir_path):
             os.mkdir(dest_dir_path)
@@ -57,10 +58,10 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 if file.endswith('.md'):
                     dest_path = file.replace('.md', '.html')
                     full_dest_path = os.path.join(dest_dir_path, dest_path)
-                    generate_page(full_path, template_path, full_dest_path)
+                    generate_page(full_path, template_path, full_dest_path, basepath)
                 else:
                     subdir = os.path.join(dest_dir_path, file)
-                    recursion(full_path, template_path, subdir)
+                    recursion(full_path, template_path, subdir, basepath)
             else:
                 subdir = os.path.join(dest_dir_path, file)
                 recursion(full_path, template_path, subdir)
@@ -68,7 +69,10 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
                 
                 
 def main():
-    shutil.rmtree("./public")
-    copy_static("./static", "./public")
-    generate_pages_recursive("./content", "./template.html", "./public")
+    basepath = "/"
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
+    shutil.rmtree("./docs")
+    copy_static("./static", "./docs")
+    generate_pages_recursive("./content", "./template.html", "./docs", basepath)
 main()
